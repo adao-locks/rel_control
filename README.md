@@ -15,11 +15,16 @@ For help getting started with Flutter development, view the
 [online documentation](https://docs.flutter.dev/), which offers tutorials,
 samples, guidance on mobile development, and a full API reference.
 
-## Resources you need
+## Resources You Can Need
 
 You can choose your preferred environment.
 
-You will need the Flutter SDK to run the project so install it here
+You will need the Flutter SDK to run the project so install it [here](https://docs.flutter.dev/get-started/install)
+
+If you use [Visual Studio Code](https://code.visualstudio.com/), I highly recommend using the extensions: 
+- [Flutter](https://marketplace.visualstudio.com/items?itemName=Dart-Code.flutter)
+- [Dart](https://marketplace.visualstudio.com/items?itemName=Dart-Code.dart-code)
+- [Flutter Widget Snippets](https://marketplace.visualstudio.com/items?itemName=alexisvt.flutter-snippets)
 
 ## How to Run the Project
 
@@ -34,3 +39,16 @@ To check status run:
 Then finally:
 
 `flutter run`
+
+### **Maybe necessaary**
+
+You may need to update flutter, you can run:
+
+`flutter upgrade`
+
+Or, you can force the update
+
+`flutter channel stable` <br>
+`flutter upgrade`
+
+After all you need to run `flutter pub get` again.

@@ -7,12 +7,12 @@ class DB {
   static Future<PostgreSQLConnection> connect() async {
     if (_conn == null || _conn!.isClosed) {
       _conn = PostgreSQLConnection(
-    '172.20.20.81', // IP
-    5432,           // Porta
-    'rel_control',  // Nome do banco
-    username: 'postgres',
-    password: 'GodNareba',
-  );
+        'localhost', 
+        5432, 
+        'postgres',
+        username: 'postgres',
+        password: 'admin123',
+      );
       await _conn!.open();
     }
     return _conn!;
