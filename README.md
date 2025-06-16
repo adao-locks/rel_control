@@ -40,7 +40,7 @@ Then finally:
 
 `flutter run`
 
-### Maybe necessaary
+### **Maybe necessaary**
 
 You may need to update flutter, you can run:
 
