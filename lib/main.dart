@@ -1,20 +1,24 @@
 import 'package:flutter/material.dart';
+import 'package:rel_control/db.dart';
 import 'package:uuid/uuid.dart';
 import 'package:file_picker/file_picker.dart';
 
 void main() async {
   runApp(const MyApp());
+  DB.connect();
 }
 
 var uuid = const Uuid();
 
 class Cliente {
   final String id;
+  final String codcli;
   final String nome;
   List<Registro> registros;
 
   Cliente({
     required this.id,
+    required this.codcli,
     required this.nome,
     this.registros = const [],
   });
@@ -61,17 +65,55 @@ class ClientePage extends StatefulWidget {
 
 class _ClientePageState extends State<ClientePage> {
   final List<Cliente> clientes = [];
+  final TextEditingController codcliController = TextEditingController();
   final TextEditingController nomeController = TextEditingController();
 
-  void adicionarCliente() {
-    if (nomeController.text.isEmpty) return;
+  @override
+  void initState() {
+    super.initState();
+    carregarClientes();
+  }
+
+  Future<void> carregarClientes() async {
+    final conn = await DB.connect();
+    final resultado = await conn.query('SELECT id, codcli, nome FROM cliente');
+
     setState(() {
-      clientes.add(
-        Cliente(id: uuid.v4(), nome: nomeController.text, registros: []),
-      );
-      nomeController.clear();
+      clientes.clear();
+      clientes.addAll(resultado.map((row) {
+        return Cliente(
+          id: row[0],
+          codcli: row[1].toString(),
+          nome: row[2],
+          registros: [],
+        );
+      }));
     });
   }
+
+  void adicionarCliente() async {
+    if (nomeController.text.isEmpty) return;
+
+    final String id = uuid.v4();
+    final String codcli = codcliController.text;
+    final String nome = nomeController.text;
+
+    final conn = await DB.connect();
+
+    await conn.query(
+      'INSERT INTO cliente (id, codcli, nome) VALUES (@id, @codcli, @nome)',
+      substitutionValues: {
+        'id': id,
+        'codcli': codcli,
+        'nome': nome,
+      },
+    );
+
+    nomeController.clear();
+    codcliController.clear();
+    await carregarClientes();
+  }
+
 
   void abrirRegistros(Cliente cliente) {
     Navigator.push(
@@ -101,6 +143,19 @@ class _ClientePageState extends State<ClientePage> {
                 padding: const EdgeInsets.all(12),
                 child: Row(
                   children: [
+                    SizedBox(
+                      width: 80,
+                      child: TextField(
+                        controller: codcliController,
+                        decoration: const InputDecoration(
+                          labelText: 'Codcli',
+                          border: OutlineInputBorder(),
+                        ),
+                      ),
+                    ),
+                    SizedBox(
+                      width: 20,
+                    ),
                     Expanded(
                       child: TextField(
                         controller: nomeController,
@@ -110,7 +165,7 @@ class _ClientePageState extends State<ClientePage> {
                         ),
                       ),
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: 20),
                     ElevatedButton.icon(
                       onPressed: adicionarCliente,
                       icon: const Icon(Icons.add),
@@ -168,23 +223,48 @@ class _RegistroPageState extends State<RegistroPage> {
   final TextEditingController descricaoController = TextEditingController();
   String? arquivoSelecionado;
 
-  void adicionarRegistro() {
+  void adicionarRegistro() async {
     if (nomeController.text.isEmpty || descricaoController.text.isEmpty) return;
+
+    final registro = Registro(
+      id: uuid.v4(),
+      nome: nomeController.text,
+      descricao: descricaoController.text,
+      arquivo: arquivoSelecionado,
+      dataCadastro: DateTime.now(),
+      dataAlteracao: DateTime.now(),
+    );
+
+    await DB.connect();
+    final conn = await DB.connect();
+    await conn.query(
+      '''
+      INSERT INTO registro (
+        id, nome, descricao, arquivo_path, data_cadastro, data_alteracao, cliente_id
+      )
+      VALUES (
+        @id, @nome, @descricao, @arquivo, @dataCadastro, @dataAlteracao, @clienteId
+      )
+      ''',
+      substitutionValues: {
+        'id': registro.id,
+        'nome': registro.nome,
+        'descricao': registro.descricao,
+        'arquivo': registro.arquivo,
+        'dataCadastro': registro.dataCadastro.toIso8601String(),
+        'dataAlteracao': registro.dataAlteracao.toIso8601String(),
+        'clienteId': widget.cliente.id,
+      },
+    );
+
     setState(() {
-      final registro = Registro(
-        id: uuid.v4(),
-        nome: nomeController.text,
-        descricao: descricaoController.text,
-        arquivo: arquivoSelecionado,
-        dataCadastro: DateTime.now(),
-        dataAlteracao: DateTime.now(),
-      );
       widget.cliente.registros.add(registro);
       nomeController.clear();
       descricaoController.clear();
       arquivoSelecionado = null;
     });
   }
+
 
   Future<void> selecionarArquivo() async {
     FilePickerResult? result = await FilePicker.platform.pickFiles();
@@ -299,5 +379,11 @@ class _RegistroPageState extends State<RegistroPage> {
         ),
       ),
     );
+  }
+  
+  @override
+  void dispose() {
+    DB.close();
+    super.dispose();
   }
 }
