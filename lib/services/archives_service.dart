@@ -18,18 +18,18 @@ class archivesService {
         id, name, description, archives_path, date_registered, date_updated, client_id
       )
       VALUES (
-        @id, @name, @description, @archives_path, @date_registered, @date_updated, @clientId
+        '${uuid.v4()}', '$name', '$description', '$archives_path', '${DateTime.now().toIso8601String()}', '${DateTime.now().toIso8601String()}', '$clientId'
       )
       ''',
-      substitutionValues: {
-        'id': uuid.v4(),
-        'name': name,
-        'description': description,
-        'archives_path': archives_path,
-        'date_registered': DateTime.now().toIso8601String(),
-        'date_updated': DateTime.now().toIso8601String(),
-        'clientId': clientId,
-      },
+      // substitutionValues: {
+      //   'id': uuid.v4(),
+      //   'name': name,
+      //   'description': description,
+      //   'archives_path': archives_path,
+      //   'date_registered': DateTime.now().toIso8601String(),
+      //   'date_updated': DateTime.now().toIso8601String(),
+      //   'clientId': clientId,
+      // },
     );
   }
 
