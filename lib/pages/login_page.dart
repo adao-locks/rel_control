@@ -18,15 +18,17 @@ class _LoginPageState extends State<LoginPage> {
   void login({required bool checkUser}) {
     String user = usernameController.text.trim();
 
-    if (user.isEmpty) {
+    if (checkUser && user.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
       return;
     }
 
-    if (user.toLowerCase() == 'admin') {
+    if (checkUser && user.toLowerCase() == 'admin') {
       tipoUsuario = 'admin';
+    } else if (checkUser && user.toLowerCase() == 'supervisor') {
+      tipoUsuario = 'supervisor';
     } else {
       tipoUsuario = 'user';
     }
