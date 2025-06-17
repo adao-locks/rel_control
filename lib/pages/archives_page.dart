@@ -15,8 +15,8 @@ class ArchivesPage extends StatefulWidget {
   final String tipoUsuario;
 
   const ArchivesPage({
-    super.key, 
-    required this.client, 
+    super.key,
+    required this.client,
     required this.tipoUsuario,
   });
 
@@ -45,9 +45,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
       FROM archives
       WHERE client_id = @clientId
       ''',
-      substitutionValues: {
-        'clientId': widget.client.id,
-      },
+      substitutionValues: {'clientId': widget.client.id},
     );
 
     final loadedArchives = result.map((row) {
@@ -67,7 +65,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
   }
 
   void addArchives() async {
-    if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
+    if (nameController.text.isEmpty || descriptionController.text.isEmpty)
+      return;
 
     final archives = Archives(
       id: uuid.v4(),
@@ -130,10 +129,27 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
   Future<void> deleteArchive(String archiveId) async {
     final conn = await DB.connect();
-    await conn.query(
-      'DELETE FROM archives WHERE id = @id',
+
+    final result = await conn.query(
+      'SELECT archives_path FROM archives WHERE id = @id',
       substitutionValues: {'id': archiveId},
     );
+
+    String? archivePath;
+    if (result.isNotEmpty && result.first[0] != null) {
+      archivePath = result.first[0] as String;
+    }
+    if (archivePath != null && File(archivePath).existsSync()) {
+      try {
+        await File(archivePath).delete();
+        await conn.execute(
+          'DELETE FROM archives WHERE id = @id',
+          substitutionValues: {'id': archiveId},
+        );
+      } catch (e) {
+        debugPrint('Erro ao excluir arquivo: $e');
+      }
+    }
   }
 
   void confirmDelete(String archiveId) async {
@@ -191,7 +207,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
                         if (value != upperValue) {
                           nameController.value = nameController.value.copyWith(
                             text: upperValue,
-                            selection: TextSelection.collapsed(offset: upperValue.length),
+                            selection: TextSelection.collapsed(
+                              offset: upperValue.length,
+                            ),
                           );
                         }
                       },
@@ -207,10 +225,14 @@ class _ArchivesPageState extends State<ArchivesPage> {
                       onChanged: (value) {
                         final upperValue = value.toUpperCase();
                         if (value != upperValue) {
-                          descriptionController.value = descriptionController.value.copyWith(
-                            text: upperValue,
-                            selection: TextSelection.collapsed(offset: upperValue.length),
-                          );
+                          descriptionController.value = descriptionController
+                              .value
+                              .copyWith(
+                                text: upperValue,
+                                selection: TextSelection.collapsed(
+                                  offset: upperValue.length,
+                                ),
+                              );
                         }
                       },
                     ),
@@ -256,46 +278,75 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(archives.description),
-                                Text('Arquivo: ${archives.archive ?? "Nenhum"} - ' + widget.tipoUsuario,),
-                                Text('Cadastro: ${formatardate(archives.dateRegistered)}'),
-                                Text('Alteração: ${formatardate(archives.dateUpdated)}'),
+                                Text(
+                                  'Arquivo: ${archives.archive ?? "Nenhum"} - ' +
+                                      widget.tipoUsuario,
+                                ),
+                                Text(
+                                  'Cadastro: ${formatardate(archives.dateRegistered)}',
+                                ),
+                                Text(
+                                  'Alteração: ${formatardate(archives.dateUpdated)}',
+                                ),
                               ],
                             ),
                             isThreeLine: true,
                             trailing: widget.tipoUsuario == 'admin'
-                              ? Row(
-                                  mainAxisSize: MainAxisSize.min,
-                                  children: [
-                                    IconButton(
-                                      icon: const Icon(Icons.download),
-                                      onPressed: () {
-                                        if (archives.archive != null && File(archives.archive!).existsSync()) {
-                                          OpenFile.open(archives.archive!);
-                                        } else {
-                                          ScaffoldMessenger.of(context).showSnackBar(
-                                            const SnackBar(content: Text('Arquivo não encontrado.')),
-                                          );
-                                        }
-                                      },
-                                    ),
-                                    IconButton(
-                                      icon: const Icon(Icons.delete, color: Colors.red),
-                                      onPressed: () => confirmDelete(archives.id),
-                                    ),
-                                  ],
-                                )
-                              : IconButton(
-                                  icon: const Icon(Icons.download),
-                                  onPressed: () {
-                                    if (archives.archive != null && File(archives.archive!).existsSync()) {
-                                      OpenFile.open(archives.archive!);
-                                    } else {
-                                      ScaffoldMessenger.of(context).showSnackBar(
-                                        const SnackBar(content: Text('Arquivo não encontrado.')),
-                                      );
-                                    }
-                                  },
-                                ),
+                                ? Row(
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton(
+                                        icon: const Icon(Icons.download),
+                                        onPressed: () {
+                                          if (archives.archive != null &&
+                                              File(
+                                                archives.archive!,
+                                              ).existsSync()) {
+                                            OpenFile.open(archives.archive!);
+                                          } else {
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Arquivo não encontrado.',
+                                                ),
+                                              ),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(
+                                          Icons.delete,
+                                          color: Colors.red,
+                                        ),
+                                        onPressed: () =>
+                                            confirmDelete(archives.id),
+                                      ),
+                                    ],
+                                  )
+                                : IconButton(
+                                    icon: const Icon(Icons.download),
+                                    onPressed: () {
+                                      if (archives.archive != null &&
+                                          File(
+                                            archives.archive!,
+                                          ).existsSync()) {
+                                        OpenFile.open(archives.archive!);
+                                      } else {
+                                        ScaffoldMessenger.of(
+                                          context,
+                                        ).showSnackBar(
+                                          const SnackBar(
+                                            content: Text(
+                                              'Arquivo não encontrado.',
+                                            ),
+                                          ),
+                                        );
+                                      }
+                                    },
+                                  ),
                           ),
                         );
                       },

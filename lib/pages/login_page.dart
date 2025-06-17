@@ -15,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   String tipoUsuario = '';
   String errorMessage = '';
 
-  void login({required bool validar}) {
+  void login({required bool checkUser}) {
     String user = usernameController.text.trim();
 
     if (user.isEmpty) {
@@ -86,12 +86,12 @@ class _LoginPageState extends State<LoginPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 ElevatedButton(
-                  onPressed: () => login(validar: true),
+                  onPressed: () => login(checkUser: true),
                   child: const Text('Entrar'),
                 ),
                 const SizedBox(width: 10),
                 ElevatedButton(
-                  onPressed: () => login(validar: false),
+                  onPressed: () => login(checkUser: false),
                   child: const Text('Entrar como Visitante'),
                 ),
               ],
