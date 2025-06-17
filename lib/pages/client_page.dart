@@ -7,7 +7,13 @@ import 'package:rel_control/models/client.dart';
 
 class ClientPage extends StatefulWidget {
   final String tipoUsuario;
-  const ClientPage({super.key, required this.tipoUsuario, required username});
+  final String username;
+
+  const ClientPage({
+    super.key,
+    required this.tipoUsuario,
+    required this.username,
+  });
 
   @override
   State<ClientPage> createState() => _ClientPageState();
@@ -15,7 +21,8 @@ class ClientPage extends StatefulWidget {
 
 class _ClientPageState extends State<ClientPage> {
   final uuid = const Uuid();
-  final List<Client> clients = [];
+  final List<Client> allClients = []; 
+  final List<Client> filteredClients = [];
   final TextEditingController codcliController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
@@ -32,8 +39,10 @@ class _ClientPageState extends State<ClientPage> {
     final resultado = await conn.query('SELECT id, codcli, name FROM client');
 
     setState(() {
-      clients.clear();
-      clients.addAll(resultado.map((row) {
+      allClients.clear();
+      filteredClients.clear();
+
+      allClients.addAll(resultado.map((row) {
         return Client(
           id: row[0],
           codcli: row[1].toString(),
@@ -41,6 +50,8 @@ class _ClientPageState extends State<ClientPage> {
           archives: [],
         );
       }));
+
+      filteredClients.addAll(allClients);
     });
   }
 
@@ -49,9 +60,11 @@ class _ClientPageState extends State<ClientPage> {
     final nameFilter = nameController.text.toUpperCase().trim();
 
     setState(() {
-      clients.retainWhere((client) {
-        return client.codcli.contains(codcliFilter) && client.name.toUpperCase().contains(nameFilter);
-      });
+      filteredClients.clear();
+      filteredClients.addAll(allClients.where((client) {
+        return client.codcli.contains(codcliFilter) &&
+              client.name.toUpperCase().contains(nameFilter);
+      }));
     });
   }
 
@@ -77,7 +90,7 @@ class _ClientPageState extends State<ClientPage> {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ArchivesPage(client: client, tipoUsuario: '',),
+        builder: (context) => ArchivesPage(client: client, tipoUsuario: widget.tipoUsuario,),
       ),
     ).then((_) => setState(() {}));
   }
@@ -86,7 +99,7 @@ class _ClientPageState extends State<ClientPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('clients'),
+        title: const Text('CADASTROS'),
         centerTitle: true,
         actions: [
           IconButton(
@@ -156,7 +169,7 @@ class _ClientPageState extends State<ClientPage> {
                       ElevatedButton.icon(
                         onPressed: adicionarclient,
                         icon: const Icon(Icons.add),
-                        label: Text('Adicionar - '+ widget.tipoUsuario),
+                        label: Text('Adicionar'),
                       ),
                   ],
                 ),
@@ -164,18 +177,18 @@ class _ClientPageState extends State<ClientPage> {
             ),
             const SizedBox(height: 12),
             Expanded(
-              child: clients.isEmpty
+              child: allClients.isEmpty
                   ? const Center(
                       child: Text('Nenhum cliente cadastrado.'),
                     )
                   : ListView.builder(
-                      itemCount: clients.length,
+                      itemCount: filteredClients.length,
                       itemBuilder: (context, index) {
-                        final client = clients[index];
+                        final client = filteredClients[index];
                         return Card(
                           child: ListTile(
                             // ignore: prefer_interpolation_to_compose_strings
-                            title: Text(client.codcli + ' - ' + client.name),
+                            title: Text('${client.codcli} - ${client.name}'),
                             subtitle: Text('${client.archives.length} registro(s)'),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () => abrirarchives(client),

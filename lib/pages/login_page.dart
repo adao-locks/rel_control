@@ -16,16 +16,16 @@ class _LoginPageState extends State<LoginPage> {
   String errorMessage = '';
 
   void login() {
-    String user = usernameController.text.trim();
+    String username = usernameController.text.trim();
 
-    if (user.isEmpty) {
+    if (username.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
       return;
     }
 
-    if (user.toLowerCase() == 'admin') {
+    if (username.toLowerCase() == 'admin') {
       tipoUsuario = 'admin';
     } else {
       tipoUsuario = 'user';
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ClientPage(tipoUsuario: tipoUsuario, username: user),
+        builder: (context) => ClientPage(tipoUsuario: tipoUsuario, username: username),
       ),
     );
   }

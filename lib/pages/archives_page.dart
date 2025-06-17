@@ -16,7 +16,7 @@ class ArchivesPage extends StatefulWidget {
 
   const ArchivesPage({
     super.key, 
-    required this.client,
+    required this.client, 
     required this.tipoUsuario,
   });
 
@@ -167,7 +167,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Registros - ${widget.client.name}'),
+        title: Text('REGISTROS DE ${widget.client.name}'),
         centerTitle: true,
       ),
       body: Padding(
@@ -256,13 +256,13 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text(archives.description),
-                                Text('Arquivo: ${archives.archive ?? "Nenhum"}'),
+                                Text('Arquivo: ${archives.archive ?? "Nenhum"} - ' + widget.tipoUsuario,),
                                 Text('Cadastro: ${formatardate(archives.dateRegistered)}'),
                                 Text('Alteração: ${formatardate(archives.dateUpdated)}'),
                               ],
                             ),
                             isThreeLine: true,
-                            trailing: widget.tipoUsuario.toLowerCase() == ''
+                            trailing: widget.tipoUsuario == 'admin'
                               ? Row(
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
