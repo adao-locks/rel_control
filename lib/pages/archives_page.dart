@@ -5,10 +5,12 @@ import 'package:path/path.dart' as p;
 
 import 'package:flutter/material.dart';
 import 'package:file_picker/file_picker.dart';
+import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
 import 'package:rel_control/models/client.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rel_control/models/archives.dart';
+import 'package:rel_control/providers/user_state.dart';
 
 class ArchivesPage extends StatefulWidget {
   final Client client;
@@ -181,6 +183,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserState>(context);
+    final tipoUsuario = user.tipoUsuario;
     return Scaffold(
       appBar: AppBar(
         title: Text('REGISTROS DE ${widget.client.name}'),
@@ -279,7 +283,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               children: [
                                 Text(archives.description),
                                 Text(
-                                  'Arquivo: ${archives.archive ?? "Nenhum"}'
+                                  'Arquivo: ${archives.archive ?? "Nenhum"}',
                                 ),
                                 Text(
                                   'Cadastro: ${formatardate(archives.dateRegistered)}',
@@ -290,7 +294,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               ],
                             ),
                             isThreeLine: true,
-                            trailing: widget.tipoUsuario == 'admin'
+                            trailing: tipoUsuario == 'admin'
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
