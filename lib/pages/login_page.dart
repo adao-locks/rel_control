@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (username.toLowerCase() == 'admin') {
+    if (user.toLowerCase() == 'admin') {
       tipoUsuario = 'admin';
     } else {
       tipoUsuario = 'user';
