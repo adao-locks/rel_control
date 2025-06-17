@@ -16,9 +16,9 @@ class _LoginPageState extends State<LoginPage> {
   String errorMessage = '';
 
   void login() {
-    String username = usernameController.text.trim();
+    String user = usernameController.text.trim();
 
-    if (username.isEmpty) {
+    if (user.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
@@ -38,7 +38,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ClientPage(tipoUsuario: tipoUsuario, username: username),
+        builder: (context) => ClientPage(tipoUsuario: tipoUsuario, username: user),
       ),
     );
   }
@@ -64,7 +64,9 @@ class _LoginPageState extends State<LoginPage> {
                 if (value != upperValue) {
                   usernameController.value = usernameController.value.copyWith(
                     text: upperValue,
-                    selection: TextSelection.collapsed(offset: upperValue.length),
+                    selection: TextSelection.collapsed(
+                      offset: upperValue.length,
+                    ),
                   );
                 }
               },
@@ -79,15 +81,28 @@ class _LoginPageState extends State<LoginPage> {
               ),
             ),
             const SizedBox(height: 16),
-            ElevatedButton(
-              onPressed: login,
-              child: const Text('Entrar'),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                ElevatedButton(
+                  onPressed: () => login(validar: true),
+                  child: const Text('Entrar'),
+                ),
+                const SizedBox(width: 10),
+                ElevatedButton(
+                  onPressed: () => login(validar: false),
+                  child: const Text('Entrar como Visitante'),
+                ),
+              ],
             ),
             const SizedBox(height: 8),
             if (errorMessage.isNotEmpty)
               Text(
                 errorMessage,
-                style: const TextStyle(color: Colors.red, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                  color: Colors.red,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
           ],
         ),
