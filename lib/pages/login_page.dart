@@ -20,7 +20,6 @@ class _LoginPageState extends State<LoginPage> {
     String user = usernameController.text.trim();
 
     if (checkUser && user.isEmpty) {
-    if (checkUser && user.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
