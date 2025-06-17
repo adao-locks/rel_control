@@ -15,7 +15,7 @@ class _LoginPageState extends State<LoginPage> {
   String tipoUsuario = '';
   String errorMessage = '';
 
-  void login() {
+  void login({required bool validar}) {
     String user = usernameController.text.trim();
 
     if (user.isEmpty) {
@@ -25,7 +25,7 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    if (username.toLowerCase() == 'admin') {
+    if (user.toLowerCase() == 'admin') {
       tipoUsuario = 'admin';
     } else {
       tipoUsuario = 'user';
@@ -38,7 +38,8 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) => ClientPage(tipoUsuario: tipoUsuario, username: user),
+        builder: (context) =>
+            ClientPage(tipoUsuario: tipoUsuario, username: user),
       ),
     );
   }
