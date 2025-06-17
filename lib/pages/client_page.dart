@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
-import 'package:rel_control/models/archives.dart';
 import 'package:rel_control/pages/archives_page.dart';
 import 'package:rel_control/providers/user_state.dart';
 import 'package:uuid/uuid.dart';
@@ -48,7 +47,7 @@ class _ClientPageState extends State<ClientPage> {
           id: row[0],
           codcli: row[1].toString(),
           name: row[2],
-          archivesCount: row[3] as int, // 👈 Aqui
+          archivesCount: row[3] as int,
         );
       }));
 
