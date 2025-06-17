@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
+import 'package:rel_control/models/archives.dart';
 import 'package:rel_control/pages/archives_page.dart';
 import 'package:rel_control/providers/user_state.dart';
 import 'package:uuid/uuid.dart';
@@ -32,7 +33,11 @@ class _ClientPageState extends State<ClientPage> {
 
   Future<void> carregarClients() async {
     final conn = await DB.connect();
-    final resultado = await conn.query('SELECT id, codcli, name FROM client');
+    final resultado = await conn.query('''
+      SELECT c.id, c.codcli, c.name, 
+      (SELECT COUNT(*) FROM archives a WHERE a.client_id = c.id) as archive_count
+      FROM client c
+    ''');
 
     setState(() {
       allClients.clear();
@@ -43,7 +48,7 @@ class _ClientPageState extends State<ClientPage> {
           id: row[0],
           codcli: row[1].toString(),
           name: row[2],
-          archives: [],
+          archivesCount: row[3] as int, // 👈 Aqui
         );
       }));
 
@@ -181,8 +186,7 @@ class _ClientPageState extends State<ClientPage> {
                         return Card(
                           child: ListTile(
                             title: Text('${client.codcli} - ${client.name}'),
-                            subtitle:
-                                Text('${client.archives.length} registro(s)'),
+                            subtitle: Text('${client.archivesCount} registro(s)'),
                             trailing: const Icon(Icons.arrow_forward_ios),
                             onTap: () => abrirArchives(client),
                           ),

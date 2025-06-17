@@ -5,11 +5,13 @@ class Client {
   final String codcli;
   final String name;
   List<Archives> archives;
+  final int archivesCount;
 
   Client({
     required this.id,
     required this.codcli,
     required this.name,
     this.archives = const [],
+    this.archivesCount = 0,
   });
 }
