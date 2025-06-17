@@ -156,7 +156,7 @@ class _ClientPageState extends State<ClientPage> {
                       ElevatedButton.icon(
                         onPressed: adicionarclient,
                         icon: const Icon(Icons.add),
-                        label: const Text('Adicionar'),
+                        label: Text('Adicionar - '+ widget.tipoUsuario),
                       ),
                   ],
                 ),
