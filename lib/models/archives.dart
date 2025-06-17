@@ -1,17 +1,17 @@
 class Archives {
   final String id;
-  String name;
-  String description;
-  String? arquivo;
-  DateTime dateRegistered;
-  DateTime dateUpdated;
+  final String name;
+  final String description;
+  final String? archive;
+  final DateTime dateRegistered;
+  final DateTime dateUpdated;
 
   Archives({
     required this.id,
     required this.name,
     required this.description,
-    this.arquivo,
+    required this.archive,
     required this.dateRegistered,
-    required this.dateUpdated, String? archives,
+    required this.dateUpdated,
   });
 }

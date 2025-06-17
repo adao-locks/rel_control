@@ -73,11 +73,11 @@ class _ClientPageState extends State<ClientPage> {
     await carregarclients();
   }
 
-  void abrirarchivess(Client client) {
+  void abrirarchives(Client client) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ArchivesPage(client: client),
+        builder: (context) => ArchivesPage(client: client, tipoUsuario: '',),
       ),
     ).then((_) => setState(() {}));
   }
@@ -178,7 +178,7 @@ class _ClientPageState extends State<ClientPage> {
                             title: Text(client.codcli + ' - ' + client.name),
                             subtitle: Text('${client.archives.length} registro(s)'),
                             trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () => abrirarchivess(client),
+                            onTap: () => abrirarchives(client),
                           ),
                         );
                       },

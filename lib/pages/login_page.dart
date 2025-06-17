@@ -17,7 +17,6 @@ class _LoginPageState extends State<LoginPage> {
 
   void login() {
     String user = usernameController.text.trim();
-    String pass = passwordController.text.trim();
 
     if (user.isEmpty) {
       setState(() {
@@ -26,13 +25,10 @@ class _LoginPageState extends State<LoginPage> {
       return;
     }
 
-    // Aqui você pode adicionar uma verificação da senha se quiser
-    // Atualmente senha não está sendo validada
-
-    if (user.toLowerCase() == 'admin') {
-      tipoUsuario = 'admin';
+    if (user.toLowerCase() == 'ADMIN') {
+      tipoUsuario = 'ADMIN';
     } else {
-      tipoUsuario = 'user';
+      tipoUsuario = 'USE';
     }
 
     setState(() {
