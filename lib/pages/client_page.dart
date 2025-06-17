@@ -1,19 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
 import 'package:rel_control/pages/archives_page.dart';
+import 'package:rel_control/providers/user_state.dart';
 import 'package:uuid/uuid.dart';
 import 'package:rel_control/models/client.dart';
 
 class ClientPage extends StatefulWidget {
-  final String tipoUsuario;
-  final String username;
-
-  const ClientPage({
-    super.key,
-    required this.tipoUsuario,
-    required this.username,
-  });
+  const ClientPage({super.key});
 
   @override
   State<ClientPage> createState() => _ClientPageState();
@@ -21,20 +16,21 @@ class ClientPage extends StatefulWidget {
 
 class _ClientPageState extends State<ClientPage> {
   final uuid = const Uuid();
-  final List<Client> allClients = []; 
+  final List<Client> allClients = [];
   final List<Client> filteredClients = [];
+
   final TextEditingController codcliController = TextEditingController();
   final TextEditingController nameController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    carregarclients();
+    carregarClients();
     codcliController.addListener(aplicarFiltro);
     nameController.addListener(aplicarFiltro);
   }
 
-  Future<void> carregarclients() async {
+  Future<void> carregarClients() async {
     final conn = await DB.connect();
     final resultado = await conn.query('SELECT id, codcli, name FROM client');
 
@@ -63,12 +59,12 @@ class _ClientPageState extends State<ClientPage> {
       filteredClients.clear();
       filteredClients.addAll(allClients.where((client) {
         return client.codcli.contains(codcliFilter) &&
-              client.name.toUpperCase().contains(nameFilter);
+            client.name.toUpperCase().contains(nameFilter);
       }));
     });
   }
 
-  void adicionarclient() async {
+  void adicionarClient() async {
     if (nameController.text.isEmpty) return;
 
     final id = uuid.v4();
@@ -83,29 +79,46 @@ class _ClientPageState extends State<ClientPage> {
 
     nameController.clear();
     codcliController.clear();
-    await carregarclients();
+    await carregarClients();
   }
 
-  void abrirarchives(Client client) {
+  void abrirArchives(Client client) {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ArchivesPage(client: client, tipoUsuario: widget.tipoUsuario,),
+        builder: (context) => ArchivesPage(client: client, tipoUsuario: '',),
       ),
     ).then((_) => setState(() {}));
   }
 
   @override
   Widget build(BuildContext context) {
+    final user = Provider.of<UserState>(context);
+    final tipoUsuario = user.tipoUsuario;
+    final username = user.username;
+
     return Scaffold(
       appBar: AppBar(
-        title: const Text('CADASTROS'),
+        title: Text('Bem-vindo $username'),
         centerTitle: true,
         actions: [
+          Container(
+            alignment: Alignment.center,
+            padding: const EdgeInsets.symmetric(horizontal: 8),
+            child: Text(
+              tipoUsuario.toUpperCase(),
+              style: Theme.of(context).textTheme.titleMedium!.copyWith(
+                    color: Colors.white,
+                    fontWeight: FontWeight.bold,
+                  ),
+            ),
+          ),
           IconButton(
             icon: const Icon(Icons.logout),
             onPressed: () {
-              Navigator.pushNamedAndRemoveUntil(context, '/login', (route) => false);
+              Provider.of<UserState>(context, listen: false).clearUser();
+              Navigator.pushNamedAndRemoveUntil(
+                  context, '/login', (route) => false);
             },
           ),
         ],
@@ -125,23 +138,13 @@ class _ClientPageState extends State<ClientPage> {
                         controller: codcliController,
                         maxLength: 5,
                         inputFormatters: [
-                          FilteringTextInputFormatter.allow(RegExp(r'[0-9]')),
+                          FilteringTextInputFormatter.digitsOnly,
                         ],
                         decoration: const InputDecoration(
                           labelText: 'Codcli',
                           border: OutlineInputBorder(),
                           counterText: '',
                         ),
-                      textCapitalization: TextCapitalization.characters,
-                      onChanged: (value) {
-                        final upperValue = value.toUpperCase();
-                        if (value != upperValue) {
-                          codcliController.value = codcliController.value.copyWith(
-                            text: upperValue,
-                            selection: TextSelection.collapsed(offset: upperValue.length),
-                          );
-                        }
-                      },
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -149,27 +152,17 @@ class _ClientPageState extends State<ClientPage> {
                       child: TextField(
                         controller: nameController,
                         decoration: const InputDecoration(
-                          labelText: 'nome do cliente',
+                          labelText: 'Nome do Cliente',
                           border: OutlineInputBorder(),
                         ),
-                      textCapitalization: TextCapitalization.characters,
-                      onChanged: (value) {
-                        final upperValue = value.toUpperCase();
-                        if (value != upperValue) {
-                          nameController.value = nameController.value.copyWith(
-                            text: upperValue,
-                            selection: TextSelection.collapsed(offset: upperValue.length),
-                          );
-                        }
-                      },
                       ),
                     ),
                     const SizedBox(width: 20),
-                    if (widget.tipoUsuario == 'admin')
+                    if (tipoUsuario == 'admin')
                       ElevatedButton.icon(
-                        onPressed: adicionarclient,
+                        onPressed: adicionarClient,
                         icon: const Icon(Icons.add),
-                        label: Text('Adicionar'),
+                        label: const Text('Adicionar'),
                       ),
                   ],
                 ),
@@ -187,11 +180,11 @@ class _ClientPageState extends State<ClientPage> {
                         final client = filteredClients[index];
                         return Card(
                           child: ListTile(
-                            // ignore: prefer_interpolation_to_compose_strings
                             title: Text('${client.codcli} - ${client.name}'),
-                            subtitle: Text('${client.archives.length} registro(s)'),
+                            subtitle:
+                                Text('${client.archives.length} registro(s)'),
                             trailing: const Icon(Icons.arrow_forward_ios),
-                            onTap: () => abrirarchives(client),
+                            onTap: () => abrirArchives(client),
                           ),
                         );
                       },

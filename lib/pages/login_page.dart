@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:rel_control/pages/client_page.dart';
+import 'package:rel_control/providers/user_state.dart';
 
 class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
@@ -12,24 +14,30 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController usernameController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
 
-  String tipoUsuario = '';
   String errorMessage = '';
 
   void login({required bool checkUser}) {
     String user = usernameController.text.trim();
 
-    if (user.isEmpty) {
+    if (checkUser && user.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
       return;
     }
 
-    if (user.toLowerCase() == 'admin') {
-      tipoUsuario = 'admin';
+    String tipo;
+    if (checkUser && user.toLowerCase() == 'admin') {
+      tipo = 'admin';
+    } else if (checkUser && user.toLowerCase() == 'supervisor') {
+      tipo = 'supervisor';
     } else {
-      tipoUsuario = 'user';
+      tipo = 'user';
     }
+
+    // 🔥 Salvar no Provider
+    final userState = Provider.of<UserState>(context, listen: false);
+    userState.setUser(tipo, user);
 
     setState(() {
       errorMessage = '';
@@ -38,8 +46,7 @@ class _LoginPageState extends State<LoginPage> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (context) =>
-            ClientPage(tipoUsuario: tipoUsuario, username: user),
+        builder: (context) => const ClientPage(),
       ),
     );
   }

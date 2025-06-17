@@ -1,12 +1,21 @@
 import 'package:flutter/material.dart';
-import 'package:rel_control/db.dart';
+import 'package:provider/provider.dart';
 import 'package:rel_control/pages/login_page.dart';
 import 'package:rel_control/pages/client_page.dart';
+import 'package:rel_control/providers/user_state.dart';
 
 void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await DB.connect();
-  runApp(const MyApp());
+  // WidgetsFlutterBinding.ensureInitialized();
+  // await DB.connect();
+  // runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => UserState()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -24,7 +33,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/login',
       routes: {
         '/login': (context) => const LoginPage(),
-        '/client': (context) => const ClientPage(tipoUsuario: '', username: '',),
+        '/client': (context) => const ClientPage(),
       },
     );
   }

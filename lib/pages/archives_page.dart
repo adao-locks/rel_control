@@ -279,8 +279,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               children: [
                                 Text(archives.description),
                                 Text(
-                                  'Arquivo: ${archives.archive ?? "Nenhum"} - ' +
-                                      widget.tipoUsuario,
+                                  'Arquivo: ${archives.archive ?? "Nenhum"}'
                                 ),
                                 Text(
                                   'Cadastro: ${formatardate(archives.dateRegistered)}',
