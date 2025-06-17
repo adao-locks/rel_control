@@ -34,7 +34,10 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
-  
+  final formController = TextEditingController();
+  final idEmpresaController = TextEditingController();
+
+  String? editingArchiveId;  
   String? selectedArchive;
 
   @override
@@ -63,7 +66,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
     final result = await conn.query(
       '''
-      SELECT id, name, description, archives_path, date_registered, date_updated
+      SELECT id, name, description, form, emp_id, archives_path, date_registered, date_updated
       FROM archives
       WHERE client_id = @clientId
       ''',
@@ -75,9 +78,11 @@ class _ArchivesPageState extends State<ArchivesPage> {
         id: row[0] as String,
         name: row[1] as String,
         description: row[2] as String,
-        archive: row[3] as String?,
-        dateRegistered: row[4] as DateTime,
-        dateUpdated: row[5] as DateTime,
+        form: row[3] as String,
+        emp_id: row[4] as String,
+        archive: row[5] as String?,
+        dateRegistered: row[6] as DateTime,
+        dateUpdated: row[7] as DateTime,
       );
     }).toList();
 
@@ -91,13 +96,14 @@ class _ArchivesPageState extends State<ArchivesPage> {
   }
 
   void addArchives() async {
-    if (nameController.text.isEmpty || descriptionController.text.isEmpty)
-      return;
+    if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
 
     final archives = Archives(
       id: uuid.v4(),
       name: nameController.text,
       description: descriptionController.text,
+      form: formController.text,
+      emp_id: idEmpresaController.text,
       archive: selectedArchive,
       dateRegistered: DateTime.now(),
       dateUpdated: DateTime.now(),
@@ -106,13 +112,15 @@ class _ArchivesPageState extends State<ArchivesPage> {
     final conn = await DB.connect();
     await conn.query(
       '''
-      INSERT INTO archives (id, name, description, archives_path, date_registered, date_updated, client_id)
-      VALUES (@id, @name, @description, @archives_path, @dateRegistered, @dateUpdated, @clientId)
+      INSERT INTO archives (id, name, description, form, emp_id, archives_path, date_registered, date_updated, client_id)
+      VALUES (@id, @name, @description,  @form, @emp_id, @archives_path, @dateRegistered, @dateUpdated, @clientId)
       ''',
       substitutionValues: {
         'id': archives.id,
         'name': archives.name,
         'description': archives.description,
+        'form': archives.form,
+        'emp_id': archives.emp_id,
         'archives_path': archives.archive,
         'dateRegistered': archives.dateRegistered.toIso8601String(),
         'dateUpdated': archives.dateUpdated.toIso8601String(),
@@ -126,7 +134,60 @@ class _ArchivesPageState extends State<ArchivesPage> {
       aplicarFiltro();
       nameController.clear();
       descriptionController.clear();
+      formController.clear();
+      idEmpresaController.clear();
       selectedArchive = null;
+    });
+  }
+
+  void editArchive() async {
+    if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
+
+    final conn = await DB.connect();
+
+    if (editingArchiveId != null) {
+      await conn.query(
+        '''
+        UPDATE archives 
+        SET name = @name, description = @description, form = @form, emp_id = @emp_id, archives_path = @archives_path, date_updated = @dateUpdated
+        WHERE id = @id
+        ''',
+        substitutionValues: {
+          'id': editingArchiveId,
+          'name': nameController.text,
+          'description': descriptionController.text,
+          'form': formController.text,
+          'emp_id': idEmpresaController.text,
+          'archives_path': selectedArchive,
+          'dateUpdated': DateTime.now().toIso8601String(),
+        },
+      );
+
+      final index = widget.client.archives.indexWhere((a) => a.id == editingArchiveId);
+      if (index != -1) {
+        setState(() {
+          widget.client.archives[index] = Archives(
+            id: editingArchiveId!,
+            name: nameController.text,
+            description: descriptionController.text,
+            form: formController.text,
+            emp_id: idEmpresaController.text,
+            archive: selectedArchive,
+            dateRegistered: widget.client.archives[index].dateRegistered,
+            dateUpdated: DateTime.now(),
+          );
+        });
+      }
+
+    }
+
+    setState(() {
+      nameController.clear();
+      descriptionController.clear();
+      formController.clear();
+      idEmpresaController.clear();
+      selectedArchive = null;
+      editingArchiveId = null;
     });
   }
 
@@ -267,6 +328,54 @@ class _ArchivesPageState extends State<ArchivesPage> {
                       },
                     ),
                     const SizedBox(height: 8),
+                    Row(
+                      children: [
+                        Expanded(
+                          child: TextField(
+                            controller: formController,
+                            decoration: const InputDecoration(
+                              labelText: 'Form',
+                              border: OutlineInputBorder(),
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            onChanged: (value) {
+                              final upperValue = value.toUpperCase();
+                              if (value != upperValue) {
+                                formController.value = formController.value.copyWith(
+                                  text: upperValue,
+                                  selection: TextSelection.collapsed(
+                                    offset: upperValue.length,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        Expanded(
+                          child: TextField(
+                            controller: idEmpresaController,
+                            decoration: const InputDecoration(
+                              labelText: 'ID Empresa',
+                              border: OutlineInputBorder(),
+                            ),
+                            textCapitalization: TextCapitalization.characters,
+                            onChanged: (value) {
+                              final upperValue = value.toUpperCase();
+                              if (value != upperValue) {
+                                idEmpresaController.value = idEmpresaController.value.copyWith(
+                                  text: upperValue,
+                                  selection: TextSelection.collapsed(
+                                    offset: upperValue.length,
+                                  ),
+                                );
+                              }
+                            },
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(width: 8),
                     if (tipoUsuario == 'admin')
                     Row(
                       children: [
@@ -286,10 +395,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
                     ),
                     const SizedBox(height: 8),
                     if (tipoUsuario == 'admin')
-                    ElevatedButton.icon(
-                      onPressed: addArchives,
-                      icon: const Icon(Icons.save),
-                      label: const Text('Salvar registro'),
+                    ElevatedButton(
+                      onPressed: editingArchiveId == null ? addArchives : editArchive,
+                      child: Text(editingArchiveId == null ? 'Salvar Registro' : 'Atualizar Registro'),
                     ),
                   ],
                 ),
@@ -311,13 +419,16 @@ class _ArchivesPageState extends State<ArchivesPage> {
                               children: [
                                 Text(archives.description),
                                 Text(
+                                  'Tela: ${archives.form} - Emp_ID: ${archives.emp_id}',
+                                ),
+                                Text(
                                   'Arquivo: ${archives.archive ?? "Nenhum"}',
                                 ),
                                 Text(
                                   'Cadastro: ${formatardate(archives.dateRegistered)}',
                                 ),
                                 Text(
-                                  'Alteração: ${formatardate(archives.dateUpdated)}',
+                                  'Última Alteração: ${formatardate(archives.dateUpdated)}',
                                 ),
                               ],
                             ),
@@ -345,6 +456,17 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                               ),
                                             );
                                           }
+                                        },
+                                      ),
+                                      IconButton(
+                                        icon: const Icon(Icons.edit, color: Colors.blue),
+                                        onPressed: () {
+                                          setState(() {
+                                            nameController.text = archives.name;
+                                            descriptionController.text = archives.description;
+                                            selectedArchive = archives.archive;
+                                            editingArchiveId = archives.id;
+                                          });
                                         },
                                       ),
                                       IconButton(

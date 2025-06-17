@@ -9,16 +9,20 @@ class archivesService {
     required String clientId,
     required String name,
     required String description,
+    required String form,
+    // ignore: non_constant_identifier_names
+    required String emp_id,
+    // ignore: non_constant_identifier_names
     String? archives_path,
   }) async {
     final conn = await DB.connect();
     await conn.query(
       '''
       INSERT INTO archives (
-        id, name, description, archives_path, date_registered, date_updated, client_id
+        id, name, description, form, emp_id, archives_path, date_registered, date_updated, client_id
       )
       VALUES (
-        '${uuid.v4()}', '$name', '$description', '$archives_path', '${DateTime.now().toIso8601String()}', '${DateTime.now().toIso8601String()}', '$clientId'
+        '${uuid.v4()}', '$name', '$description', '$form', '$emp_id', '$archives_path', '${DateTime.now().toIso8601String()}', '${DateTime.now().toIso8601String()}', '$clientId'
       )
       ''',
       // substitutionValues: {
