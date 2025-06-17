@@ -99,11 +99,10 @@ class _ClientPageState extends State<ClientPage> {
   Widget build(BuildContext context) {
     final user = Provider.of<UserState>(context);
     final tipoUsuario = user.tipoUsuario;
-    final username = user.username;
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Bem-vindo $username'),
+        title: Text('Bem-vindo'),
         centerTitle: true,
         actions: [
           Container(
@@ -112,7 +111,7 @@ class _ClientPageState extends State<ClientPage> {
             child: Text(
               tipoUsuario.toUpperCase(),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Colors.white,
+                    color: Colors.blueGrey,
                     fontWeight: FontWeight.bold,
                   ),
             ),

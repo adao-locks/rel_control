@@ -28,14 +28,34 @@ class ArchivesPage extends StatefulWidget {
 
 class _ArchivesPageState extends State<ArchivesPage> {
   final uuid = const Uuid();
+  
+  final List<Archives> archivesList = [];
+  final List<Archives> filteredArchives = [];
+
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
+  
   String? selectedArchive;
 
   @override
   void initState() {
     super.initState();
     loadData();
+    nameController.addListener(aplicarFiltro);
+    descriptionController.addListener(aplicarFiltro);
+  }
+
+  void aplicarFiltro() {
+    final nameFilter = nameController.text.toUpperCase().trim();
+    final descFilter = descriptionController.text.toUpperCase().trim();
+
+    setState(() {
+      filteredArchives.clear();
+      filteredArchives.addAll(archivesList.where((client) {
+        return client.name.contains(nameFilter) &&
+            client.description.toUpperCase().contains(descFilter);
+      }));
+    });
   }
 
   Future<void> loadData() async {
@@ -63,6 +83,10 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
     setState(() {
       widget.client.archives = loadedArchives;
+      archivesList.clear();
+      archivesList.addAll(loadedArchives);
+      filteredArchives.clear();
+      filteredArchives.addAll(loadedArchives);
     });
   }
 
@@ -98,6 +122,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
     setState(() {
       widget.client.archives.add(archives);
+      archivesList.add(archives);
+      aplicarFiltro();
       nameController.clear();
       descriptionController.clear();
       selectedArchive = null;
@@ -241,6 +267,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                       },
                     ),
                     const SizedBox(height: 8),
+                    if (tipoUsuario == 'admin')
                     Row(
                       children: [
                         ElevatedButton.icon(
@@ -258,6 +285,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                       ],
                     ),
                     const SizedBox(height: 8),
+                    if (tipoUsuario == 'admin')
                     ElevatedButton.icon(
                       onPressed: addArchives,
                       icon: const Icon(Icons.save),
@@ -272,9 +300,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
               child: widget.client.archives.isEmpty
                   ? const Center(child: Text('Nenhum registro cadastrado.'))
                   : ListView.builder(
-                      itemCount: widget.client.archives.length,
+                      itemCount: filteredArchives.length,
                       itemBuilder: (context, index) {
-                        final archives = widget.client.archives[index];
+                        final archives = filteredArchives[index];
                         return Card(
                           child: ListTile(
                             title: Text(archives.name),
