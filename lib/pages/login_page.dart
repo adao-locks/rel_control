@@ -80,9 +80,31 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text('Login')),
+      appBar: AppBar(
+        title: const Text('Login'),
+        centerTitle: true,
+        backgroundColor: Colors.teal,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              showAboutDialog(
+                context: context,
+                applicationName: 'RelControl',
+                applicationVersion: '1.0.0',
+                applicationIcon: const Icon(Icons.computer),
+                children: [
+                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
+                  const SizedBox(height: 10),
+                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
+                ],
+              );
+            },
+          ),
+        ],
+      ),
       body: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.only(left: 400, right: 400, top: 200, bottom: 200),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -92,6 +114,7 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'Usuário',
                 border: OutlineInputBorder(),
               ),
+              textAlign: TextAlign.center,
               textCapitalization: TextCapitalization.characters,
               onChanged: (value) {
                 final upperValue = value.toUpperCase();
@@ -113,6 +136,7 @@ class _LoginPageState extends State<LoginPage> {
                 labelText: 'Senha',
                 border: OutlineInputBorder(),
               ),
+              textAlign: TextAlign.center,
             ),
             const SizedBox(height: 16),
             Row(
