@@ -46,17 +46,23 @@ class _ArchivesPageState extends State<ArchivesPage> {
     loadData();
     nameController.addListener(aplicarFiltro);
     descriptionController.addListener(aplicarFiltro);
+    formController.addListener(aplicarFiltro);
+    idEmpresaController.addListener(aplicarFiltro);
   }
 
   void aplicarFiltro() {
     final nameFilter = nameController.text.toUpperCase().trim();
     final descFilter = descriptionController.text.toUpperCase().trim();
+    final formFilter = formController.text.toUpperCase().trim();
+    final idEmpresaFilter = idEmpresaController.text.toUpperCase().trim();
 
     setState(() {
       filteredArchives.clear();
       filteredArchives.addAll(archivesList.where((client) {
-        return client.name.contains(nameFilter) &&
-            client.description.toUpperCase().contains(descFilter);
+        return client.name.toUpperCase().contains(nameFilter) &&
+            client.description.toUpperCase().contains(descFilter) &&
+            client.form.toUpperCase().contains(formFilter) &&
+            client.emp_id.toUpperCase().contains(idEmpresaFilter);
       }));
     });
   }
@@ -95,6 +101,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
     });
   }
 
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
   void addArchives() async {
     if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
 
@@ -131,15 +140,18 @@ class _ArchivesPageState extends State<ArchivesPage> {
     setState(() {
       widget.client.archives.add(archives);
       archivesList.add(archives);
-      aplicarFiltro();
       nameController.clear();
       descriptionController.clear();
       formController.clear();
       idEmpresaController.clear();
       selectedArchive = null;
+      aplicarFiltro();
     });
   }
 
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
+//--------------------------------------------------------------------------------------------------------------
   void editArchive() async {
     if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
 
@@ -188,6 +200,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
       idEmpresaController.clear();
       selectedArchive = null;
       editingArchiveId = null;
+      aplicarFiltro();
+      loadData();
     });
   }
 
@@ -437,7 +451,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                 ? Row(
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      IconButton(
+                                      IconButton( //DownloadButton
                                         icon: const Icon(Icons.download),
                                         onPressed: () {
                                           if (archives.archive != null &&
@@ -458,18 +472,20 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                           }
                                         },
                                       ),
-                                      IconButton(
+                                      IconButton( //EditButton
                                         icon: const Icon(Icons.edit, color: Colors.blue),
                                         onPressed: () {
                                           setState(() {
                                             nameController.text = archives.name;
                                             descriptionController.text = archives.description;
+                                            formController.text = archives.form;
+                                            idEmpresaController.text = archives.emp_id;
                                             selectedArchive = archives.archive;
                                             editingArchiveId = archives.id;
                                           });
                                         },
                                       ),
-                                      IconButton(
+                                      IconButton( //DeleteButton
                                         icon: const Icon(
                                           Icons.delete,
                                           color: Colors.red,
@@ -479,7 +495,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                       ),
                                     ],
                                   )
-                                : IconButton(
+                                : IconButton( //DownloadButton
                                     icon: const Icon(Icons.download),
                                     onPressed: () {
                                       if (archives.archive != null &&
