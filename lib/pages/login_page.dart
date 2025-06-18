@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:rel_control/db.dart';
 import 'package:rel_control/pages/client_page.dart';
 import 'package:rel_control/providers/user_state.dart';
 
@@ -16,8 +17,9 @@ class _LoginPageState extends State<LoginPage> {
 
   String errorMessage = '';
 
-  void login({required bool checkUser}) {
+  Future<void> login({required bool checkUser}) async {
     String user = usernameController.text.trim();
+    String password = passwordController.text.trim();
 
     if (checkUser && user.isEmpty) {
       setState(() {
@@ -25,7 +27,33 @@ class _LoginPageState extends State<LoginPage> {
       });
       return;
     }
+    if (checkUser && passwordController.text.isEmpty) {
+      setState(() {
+        errorMessage = 'Informe a senha';
+      });
+      return;
+    }
 
+    final conn = await DB.connect();
+    final result = await conn.query(
+      'SELECT password FROM users WHERE username = @username',
+      substitutionValues: {'username': user.toLowerCase()},
+    );
+
+    if (result.isEmpty) {
+      setState(() {
+        errorMessage = 'Usuário não encontrado!';
+      });
+      return;
+    }
+
+    final userPassword = result[0][0] as String;
+    if (password != userPassword.toString()) {
+      setState(() {
+        errorMessage = 'Senha incorreta!';
+      });
+      return;
+    }
     String tipo;
     if (checkUser && user.toLowerCase() == 'admin') {
       tipo = 'admin';
@@ -45,9 +73,7 @@ class _LoginPageState extends State<LoginPage> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (context) => const ClientPage(),
-      ),
+      MaterialPageRoute(builder: (context) => const ClientPage()),
     );
   }
 
