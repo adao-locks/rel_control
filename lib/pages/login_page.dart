@@ -1,3 +1,5 @@
+import 'dart:ffi';
+
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
@@ -104,7 +106,7 @@ class _LoginPageState extends State<LoginPage> {
         ],
       ),
       body: Padding(
-        padding: const EdgeInsets.only(left: 400, right: 400, top: 200, bottom: 200),
+        padding: const EdgeInsets.only(left: 400, right: 400),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [

@@ -316,6 +316,23 @@ class _ArchivesPageState extends State<ArchivesPage> {
       appBar: AppBar(
         title: Text('REGISTROS DE ${widget.client.name}'),
         centerTitle: true,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              showAboutDialog(
+                context: context,
+                applicationName: 'RelControl',
+                applicationVersion: '1.0.0',
+                applicationIcon: const Icon(Icons.computer),
+                children: [
+                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
+                  const SizedBox(height: 10),
+                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
+                ],
+              );
+            },
+          ),],
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -419,6 +436,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                     if (tipoUsuario == 'admin')
                     Row(
                       children: [
+                        const SizedBox(height: 50),
                         ElevatedButton.icon(
                           onPressed: selectArchive,
                           icon: const Icon(Icons.attach_file),
@@ -457,7 +475,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text(archives.description),
+                                Text('Descrição: ${archives.description}'),
                                 Text(
                                   'Tela: ${archives.form} - Emp_ID: ${archives.emp_id}',
                                 ),

@@ -111,7 +111,6 @@ class _ClientPageState extends State<ClientPage> {
             child: Text(
               tipoUsuario.toUpperCase(),
               style: Theme.of(context).textTheme.titleMedium!.copyWith(
-                    color: Colors.blueGrey,
                     fontWeight: FontWeight.bold,
                   ),
             ),
@@ -122,6 +121,22 @@ class _ClientPageState extends State<ClientPage> {
               Provider.of<UserState>(context, listen: false).clearUser();
               Navigator.pushNamedAndRemoveUntil(
                   context, '/login', (route) => false);
+            },
+          ),
+          IconButton(
+            icon: const Icon(Icons.info_outline),
+            onPressed: () {
+              showAboutDialog(
+                context: context,
+                applicationName: 'RelControl',
+                applicationVersion: '1.0.0',
+                applicationIcon: const Icon(Icons.computer),
+                children: [
+                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
+                  const SizedBox(height: 10),
+                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
+                ],
+              );
             },
           ),
         ],
