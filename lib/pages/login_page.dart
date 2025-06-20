@@ -18,13 +18,16 @@ class _LoginPageState extends State<LoginPage> {
   String errorMessage = '';
 
   Future<void> login({required bool checkUser}) async {
-    String user = usernameController.text.trim();
-    String password = passwordController.text.trim();
+    String userType = '';
 
     if (!checkUser) {
-      user = 'user';
-      password = '123';
+      usernameController.text = 'user';
+      passwordController.text = '123';
+      userType = 'user';
     }
+
+    String user = usernameController.text.trim();
+    String password = passwordController.text.trim();
 
     if (user.isEmpty) {
       setState(() {
@@ -40,34 +43,68 @@ class _LoginPageState extends State<LoginPage> {
     }
 
     final conn = await DB.connect();
-    final result = await conn.query(
-      'SELECT password FROM users WHERE username = @username',
+    final result = await conn.mappedResultsQuery(
+      'SELECT username, password, type FROM users WHERE username = @username',
       substitutionValues: {'username': user.toLowerCase()},
-    );
-
+    );    
     if (result.isEmpty) {
+      setState(() {
+        errorMessage = 'Usuário não existe!';
+      });
+      return;
+    }
+    final row = result.first['users']!;
+    final userName = row['username'] as String;
+    final userPassword = row['password'] as String;
+    userType = row['type'] as String;
+    final checkUserResult = userType.toLowerCase();
+
+    if (userName != user.toLowerCase()) {
       setState(() {
         errorMessage = 'Usuário não encontrado!';
       });
       return;
     }
-    final String userPassword = result[0][0] as String;
     if (password != userPassword.toString()) {
       setState(() {
         errorMessage = 'Senha incorreta!';
       });
       return;
     }
+
     String tipo;
-    if (checkUser && user.toLowerCase() == 'admin') {
+    if (checkUserResult.toString() == 'admin') {
       tipo = 'admin';
-    } else if (checkUser && user.toLowerCase() == 'supervisor') {
-      tipo = 'supervisor';
+      AlertDialog(
+        title: const Text('Atenção'),
+        content: const Text(
+          'Você está logando como administrador. '
+          'Tenha cuidado ao realizar alterações no sistema.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
     } else {
       tipo = 'user';
+      AlertDialog(
+        title: const Text('Atenção'),
+        content: const Text(
+          'Você está logando como usuário. '
+          'Algumas funcionalidades podem ser limitadas.',
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.of(context).pop(),
+            child: const Text('OK'),
+          ),
+        ],
+      );
     }
 
-    // 🔥 Salvar no Provider
     final userState = Provider.of<UserState>(context, listen: false);
     userState.setUser(tipo, user);
 
