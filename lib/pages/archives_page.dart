@@ -492,9 +492,22 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             ),
                             isThreeLine: true,
                             trailing: tipoUsuario == 'admin'
-                                ? Row(
+                                ? Row( //admins
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
+                                      IconButton( //OpenButton
+                                        icon: const Icon(Icons.open_in_new),
+                                        onPressed: () {
+                                          if (archives.archive != null &&
+                                              File(archives.archive!).existsSync()) {
+                                            OpenFile.open(archives.archive!);
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            );
+                                          }
+                                        },
+                                      ),
                                       IconButton( //DownloadButton
                                         icon: const Icon(Icons.download),
                                         onPressed: () {
@@ -531,19 +544,37 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                       ),
                                     ],
                                   )
-                                : IconButton( //DownloadButton
-                                    icon: const Icon(Icons.download),
-                                    onPressed: () {
-                                      if (archives.archive != null &&
-                                          File(archives.archive!).existsSync()) {
-                                        OpenFile.open(archives.archive!);
-                                      } else {
-                                        ScaffoldMessenger.of(context).showSnackBar(
-                                          const SnackBar(content: Text('Arquivo não encontrado.')),
-                                        );
-                                      }
-                                    },
-                                  ),
+                                : Row ( //users
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      IconButton( //OpenButton
+                                        icon: const Icon(Icons.open_in_new),
+                                        onPressed: () {
+                                          if (archives.archive != null &&
+                                              File(archives.archive!).existsSync()) {
+                                            OpenFile.open(archives.archive!);
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                      IconButton( //DownloadButton
+                                        icon: const Icon(Icons.download),
+                                        onPressed: () {
+                                          if (archives.archive != null &&
+                                              File(archives.archive!).existsSync()) {
+                                            downloadFile(archives.archive!, context);
+                                          } else {
+                                            ScaffoldMessenger.of(context).showSnackBar(
+                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            );
+                                          }
+                                        },
+                                      ),
+                                    ]
+                                ),
                           ),
                         );
                       },
