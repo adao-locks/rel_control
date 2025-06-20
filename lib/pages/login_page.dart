@@ -1,4 +1,3 @@
-
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
@@ -22,13 +21,18 @@ class _LoginPageState extends State<LoginPage> {
     String user = usernameController.text.trim();
     String password = passwordController.text.trim();
 
-    if (checkUser && user.isEmpty) {
+    if (!checkUser) {
+      user = 'user';
+      password = '123';
+    }
+
+    if (user.isEmpty) {
       setState(() {
         errorMessage = 'Informe o nome de usuário';
       });
       return;
     }
-    if (checkUser && passwordController.text.isEmpty) {
+    if (password.isEmpty) {
       setState(() {
         errorMessage = 'Informe a senha';
       });
@@ -47,8 +51,7 @@ class _LoginPageState extends State<LoginPage> {
       });
       return;
     }
-
-    final userPassword = result[0][0] as String;
+    final String userPassword = result[0][0] as String;
     if (password != userPassword.toString()) {
       setState(() {
         errorMessage = 'Senha incorreta!';
@@ -95,9 +98,13 @@ class _LoginPageState extends State<LoginPage> {
                 applicationVersion: '1.0.0',
                 applicationIcon: const Icon(Icons.computer),
                 children: [
-                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
+                  const Text(
+                    'Aplicativo de controle de relatório para supervisão e automação.',
+                  ),
                   const SizedBox(height: 10),
-                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
+                  const Text(
+                    'Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer',
+                  ),
                 ],
               );
             },
