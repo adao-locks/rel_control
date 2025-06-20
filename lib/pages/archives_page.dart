@@ -29,7 +29,7 @@ class ArchivesPage extends StatefulWidget {
 
 class _ArchivesPageState extends State<ArchivesPage> {
   final uuid = const Uuid();
-  
+
   final List<Archives> archivesList = [];
   final List<Archives> filteredArchives = [];
 
@@ -38,7 +38,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
   final formController = TextEditingController();
   final idEmpresaController = TextEditingController();
 
-  String? editingArchiveId;  
+  String? editingArchiveId;
   String? selectedArchive;
 
   @override
@@ -59,12 +59,14 @@ class _ArchivesPageState extends State<ArchivesPage> {
 
     setState(() {
       filteredArchives.clear();
-      filteredArchives.addAll(archivesList.where((client) {
-        return client.name.toUpperCase().contains(nameFilter) &&
-            client.description.toUpperCase().contains(descFilter) &&
-            client.form.toUpperCase().contains(formFilter) &&
-            client.emp_id.toUpperCase().contains(idEmpresaFilter);
-      }));
+      filteredArchives.addAll(
+        archivesList.where((client) {
+          return client.name.toUpperCase().contains(nameFilter) &&
+              client.description.toUpperCase().contains(descFilter) &&
+              client.form.toUpperCase().contains(formFilter) &&
+              client.emp_id.toUpperCase().contains(idEmpresaFilter);
+        }),
+      );
     });
   }
 
@@ -103,7 +105,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
   }
 
   void addArchives() async {
-    if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
+    if (nameController.text.isEmpty || descriptionController.text.isEmpty)
+      return;
 
     final archives = Archives(
       id: uuid.v4(),
@@ -172,14 +175,15 @@ class _ArchivesPageState extends State<ArchivesPage> {
         SnackBar(content: Text('Arquivo salvo em ${newFile.path}')),
       );
     } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Erro ao baixar o arquivo: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Erro ao baixar o arquivo: $e')));
     }
   }
 
   void editArchive() async {
-    if (nameController.text.isEmpty || descriptionController.text.isEmpty) return;
+    if (nameController.text.isEmpty || descriptionController.text.isEmpty)
+      return;
 
     final conn = await DB.connect();
 
@@ -201,7 +205,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
         },
       );
 
-      final index = widget.client.archives.indexWhere((a) => a.id == editingArchiveId);
+      final index = widget.client.archives.indexWhere(
+        (a) => a.id == editingArchiveId,
+      );
       if (index != -1) {
         setState(() {
           widget.client.archives[index] = Archives(
@@ -216,7 +222,6 @@ class _ArchivesPageState extends State<ArchivesPage> {
           );
         });
       }
-
     }
 
     setState(() {
@@ -243,7 +248,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
         pastaDestino.createSync(recursive: true);
       }
 
-      final destino = File(p.join(pastaDestino.path, nomeArquivo));
+      final destino = File(
+        p.join(pastaDestino.path, widget.client.codcli, nomeArquivo),
+      );
       await origem.copy(destino.path);
 
       setState(() {
@@ -326,13 +333,18 @@ class _ArchivesPageState extends State<ArchivesPage> {
                 applicationVersion: '1.0.0',
                 applicationIcon: const Icon(Icons.computer),
                 children: [
-                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
+                  const Text(
+                    'Aplicativo de controle de relatório para supervisão e automação.',
+                  ),
                   const SizedBox(height: 10),
-                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
+                  const Text(
+                    'Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer',
+                  ),
                 ],
               );
             },
-          ),],
+          ),
+        ],
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -398,12 +410,13 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             onChanged: (value) {
                               final upperValue = value.toUpperCase();
                               if (value != upperValue) {
-                                formController.value = formController.value.copyWith(
-                                  text: upperValue,
-                                  selection: TextSelection.collapsed(
-                                    offset: upperValue.length,
-                                  ),
-                                );
+                                formController.value = formController.value
+                                    .copyWith(
+                                      text: upperValue,
+                                      selection: TextSelection.collapsed(
+                                        offset: upperValue.length,
+                                      ),
+                                    );
                               }
                             },
                           ),
@@ -420,12 +433,14 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             onChanged: (value) {
                               final upperValue = value.toUpperCase();
                               if (value != upperValue) {
-                                idEmpresaController.value = idEmpresaController.value.copyWith(
-                                  text: upperValue,
-                                  selection: TextSelection.collapsed(
-                                    offset: upperValue.length,
-                                  ),
-                                );
+                                idEmpresaController.value = idEmpresaController
+                                    .value
+                                    .copyWith(
+                                      text: upperValue,
+                                      selection: TextSelection.collapsed(
+                                        offset: upperValue.length,
+                                      ),
+                                    );
                               }
                             },
                           ),
@@ -434,29 +449,35 @@ class _ArchivesPageState extends State<ArchivesPage> {
                     ),
                     const SizedBox(width: 8),
                     if (tipoUsuario == 'admin')
-                    Row(
-                      children: [
-                        const SizedBox(height: 50),
-                        ElevatedButton.icon(
-                          onPressed: selectArchive,
-                          icon: const Icon(Icons.attach_file),
-                          label: const Text('Anexar Arquivo'),
-                        ),
-                        const SizedBox(width: 8),
-                        Expanded(
-                          child: Text(
-                            selectedArchive ?? 'Nenhum arquivo selecionado',
-                            overflow: TextOverflow.ellipsis,
+                      Row(
+                        children: [
+                          const SizedBox(height: 50),
+                          ElevatedButton.icon(
+                            onPressed: selectArchive,
+                            icon: const Icon(Icons.attach_file),
+                            label: const Text('Anexar Arquivo'),
                           ),
-                        ),
-                      ],
-                    ),
+                          const SizedBox(width: 8),
+                          Expanded(
+                            child: Text(
+                              selectedArchive ?? 'Nenhum arquivo selecionado',
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     const SizedBox(height: 8),
                     if (tipoUsuario == 'admin')
-                    ElevatedButton(
-                      onPressed: editingArchiveId == null ? addArchives : editArchive,
-                      child: Text(editingArchiveId == null ? 'Salvar Registro' : 'Atualizar Registro'),
-                    ),
+                      ElevatedButton(
+                        onPressed: editingArchiveId == null
+                            ? addArchives
+                            : editArchive,
+                        child: Text(
+                          editingArchiveId == null
+                              ? 'Salvar Registro'
+                              : 'Atualizar Registro',
+                        ),
+                      ),
                   ],
                 ),
               ),
@@ -492,49 +513,78 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             ),
                             isThreeLine: true,
                             trailing: tipoUsuario == 'admin'
-                                ? Row( //admins
+                                ? Row(
+                                    //admins
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      IconButton( //OpenButton
+                                      IconButton(
+                                        //OpenButton
                                         icon: const Icon(Icons.open_in_new),
                                         onPressed: () {
                                           if (archives.archive != null &&
-                                              File(archives.archive!).existsSync()) {
+                                              File(
+                                                archives.archive!,
+                                              ).existsSync()) {
                                             OpenFile.open(archives.archive!);
                                           } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Arquivo não encontrado.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         },
                                       ),
-                                      IconButton( //DownloadButton
+                                      IconButton(
+                                        //DownloadButton
                                         icon: const Icon(Icons.download),
                                         onPressed: () {
                                           if (archives.archive != null &&
-                                              File(archives.archive!).existsSync()) {
-                                            downloadFile(archives.archive!, context);
+                                              File(
+                                                archives.archive!,
+                                              ).existsSync()) {
+                                            downloadFile(
+                                              archives.archive!,
+                                              context,
+                                            );
                                           } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Arquivo não encontrado.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         },
                                       ),
-                                      IconButton( //EditButton
-                                        icon: const Icon(Icons.edit, color: Colors.blue),
+                                      IconButton(
+                                        //EditButton
+                                        icon: const Icon(
+                                          Icons.edit,
+                                          color: Colors.blue,
+                                        ),
                                         onPressed: () {
                                           setState(() {
                                             nameController.text = archives.name;
-                                            descriptionController.text = archives.description;
+                                            descriptionController.text =
+                                                archives.description;
                                             formController.text = archives.form;
-                                            idEmpresaController.text = archives.emp_id;
+                                            idEmpresaController.text =
+                                                archives.emp_id;
                                             selectedArchive = archives.archive;
                                             editingArchiveId = archives.id;
                                           });
                                         },
                                       ),
-                                      IconButton( //DeleteButton
+                                      IconButton(
+                                        //DeleteButton
                                         icon: const Icon(
                                           Icons.delete,
                                           color: Colors.red,
@@ -544,37 +594,59 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                       ),
                                     ],
                                   )
-                                : Row ( //users
+                                : Row(
+                                    //users
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
-                                      IconButton( //OpenButton
+                                      IconButton(
+                                        //OpenButton
                                         icon: const Icon(Icons.open_in_new),
                                         onPressed: () {
                                           if (archives.archive != null &&
-                                              File(archives.archive!).existsSync()) {
+                                              File(
+                                                archives.archive!,
+                                              ).existsSync()) {
                                             OpenFile.open(archives.archive!);
                                           } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Arquivo não encontrado.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         },
                                       ),
-                                      IconButton( //DownloadButton
+                                      IconButton(
+                                        //DownloadButton
                                         icon: const Icon(Icons.download),
                                         onPressed: () {
                                           if (archives.archive != null &&
-                                              File(archives.archive!).existsSync()) {
-                                            downloadFile(archives.archive!, context);
+                                              File(
+                                                archives.archive!,
+                                              ).existsSync()) {
+                                            downloadFile(
+                                              archives.archive!,
+                                              context,
+                                            );
                                           } else {
-                                            ScaffoldMessenger.of(context).showSnackBar(
-                                              const SnackBar(content: Text('Arquivo não encontrado.')),
+                                            ScaffoldMessenger.of(
+                                              context,
+                                            ).showSnackBar(
+                                              const SnackBar(
+                                                content: Text(
+                                                  'Arquivo não encontrado.',
+                                                ),
+                                              ),
                                             );
                                           }
                                         },
                                       ),
-                                    ]
-                                ),
+                                    ],
+                                  ),
                           ),
                         );
                       },
