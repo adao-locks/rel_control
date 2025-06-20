@@ -251,6 +251,9 @@ class _ArchivesPageState extends State<ArchivesPage> {
       final destino = File(
         p.join(pastaDestino.path, widget.client.codcli, nomeArquivo),
       );
+      if (!destino.existsSync()) {
+        destino.createSync(recursive: true);
+      }
       await origem.copy(destino.path);
 
       setState(() {
