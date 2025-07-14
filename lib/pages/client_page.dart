@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
+import 'package:rel_control/pages/all_archives_page.dart';
 import 'package:rel_control/pages/archives_page.dart';
 import 'package:rel_control/providers/user_state.dart';
 import 'package:uuid/uuid.dart';
@@ -36,6 +37,7 @@ class _ClientPageState extends State<ClientPage> {
       SELECT c.id, c.codcli, c.name, 
       (SELECT COUNT(*) FROM archives a WHERE a.client_id = c.id) as archive_count
       FROM client c
+      ORDER BY CODCLI
     ''');
 
     setState(() {
@@ -55,7 +57,7 @@ class _ClientPageState extends State<ClientPage> {
     });
   }
 
-  void aplicarFiltro() {
+  Future<void> aplicarFiltro() async {
     final codcliFilter = codcliController.text.toUpperCase().trim();
     final nameFilter = nameController.text.toUpperCase().trim();
 
@@ -66,6 +68,7 @@ class _ClientPageState extends State<ClientPage> {
             client.name.toUpperCase().contains(nameFilter);
       }));
     });
+    await carregarClients();
   }
 
   void adicionarClient() async {
@@ -91,6 +94,15 @@ class _ClientPageState extends State<ClientPage> {
       context,
       MaterialPageRoute(
         builder: (context) => ArchivesPage(client: client, tipoUsuario: '',),
+      ),
+    ).then((_) => setState(() {}));
+  }
+
+  void abrirAllArchives() {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => AllArchivesPage(tipoUsuario: '',),
       ),
     ).then((_) => setState(() {}));
   }
@@ -173,6 +185,18 @@ class _ClientPageState extends State<ClientPage> {
                           labelText: 'Nome do Cliente',
                           border: OutlineInputBorder(),
                         ),
+                        onChanged: (value) {
+                              final upperValue = value.toUpperCase();
+                              if (value != upperValue) {
+                                nameController.value = nameController.value
+                                    .copyWith(
+                                      text: upperValue,
+                                      selection: TextSelection.collapsed(
+                                        offset: upperValue.length,
+                                      ),
+                                    );
+                              }
+                            },
                       ),
                     ),
                     const SizedBox(width: 20),
@@ -181,6 +205,24 @@ class _ClientPageState extends State<ClientPage> {
                         onPressed: adicionarClient,
                         icon: const Icon(Icons.add),
                         label: const Text('Adicionar'),
+                      ),
+                      Padding(padding: const EdgeInsets.all(8),),
+                      ElevatedButton.icon(
+                        onPressed: carregarClients,
+                        icon: const Icon(Icons.replay_outlined),
+                        label: SizedBox.shrink(),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(12), // ajuste conforme necessário
+                        ),
+                      ),
+                      Padding(padding: const EdgeInsets.all(8),),
+                      ElevatedButton.icon(
+                        onPressed: abrirAllArchives,
+                        icon: const Icon(Icons.search),
+                        label: Text('Pesquisa Extendida'),
+                        style: ElevatedButton.styleFrom(
+                          padding: const EdgeInsets.all(12), // ajuste conforme necessário
+                        ),
                       ),
                   ],
                 ),
