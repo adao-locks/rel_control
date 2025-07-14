@@ -4,10 +4,8 @@ import 'dart:io';
 import 'package:open_file/open_file.dart';
 import 'package:path/path.dart' as p;
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:rel_control/db.dart';
 import 'package:rel_control/models/archives.dart';
-import 'package:rel_control/providers/user_state.dart';
 import 'package:path_provider/path_provider.dart';
 import 'package:uuid/uuid.dart';
 
@@ -29,7 +27,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
   final nameController = TextEditingController();
   final descriptionController = TextEditingController();
   final formController = TextEditingController();
-  final idEmpresaController = TextEditingController();
+  final environmentController = TextEditingController();
 
   String? selectedArchive;
 
@@ -40,14 +38,14 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
     nameController.addListener(aplicarFiltro);
     descriptionController.addListener(aplicarFiltro);
     formController.addListener(aplicarFiltro);
-    idEmpresaController.addListener(aplicarFiltro);
+    environmentController.addListener(aplicarFiltro);
   }
 
   void aplicarFiltro() {
     final nameFilter = nameController.text.toUpperCase().trim();
     final descFilter = descriptionController.text.toUpperCase().trim();
     final formFilter = formController.text.toUpperCase().trim();
-    final idEmpresaFilter = idEmpresaController.text.toUpperCase().trim();
+    final idEmpresaFilter = environmentController.text.toUpperCase().trim();
 
     setState(() {
       filteredArchives.clear();
@@ -56,7 +54,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
           return a.name.toUpperCase().contains(nameFilter) &&
               a.description.toUpperCase().contains(descFilter) &&
               a.form.toUpperCase().contains(formFilter) &&
-              a.emp_id.toUpperCase().contains(idEmpresaFilter);
+              a.environment.toUpperCase().contains(idEmpresaFilter);
         }),
       );
     });
@@ -66,7 +64,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
     final conn = await DB.connect();
 
     final result = await conn.query('''
-      SELECT id, name, description, form, emp_id, archives_path, date_registered, date_updated
+      SELECT id, name, description, form, environment, archives_path, date_registered, date_updated
       FROM archives
     ''');
 
@@ -76,7 +74,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
         name: row[1] as String,
         description: row[2] as String,
         form: row[3] as String,
-        emp_id: row[4] as String,
+        environment: row[4] as String,
         archive: row[5] as String?,
         dateRegistered: row[6] as DateTime,
         dateUpdated: row[7] as DateTime,
@@ -121,13 +119,12 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
 
   @override
   Widget build(BuildContext context) {
-    final user = Provider.of<UserState>(context);
-    final tipoUsuario = user.tipoUsuario;
-
     return Scaffold(
       appBar: AppBar(
         title: const Text('TODOS OS REGISTROS'),
         centerTitle: true,
+        backgroundColor: const Color.fromARGB(125, 192, 21, 21),
+        foregroundColor: Colors.black,
       ),
       body: Padding(
         padding: const EdgeInsets.all(12),
@@ -155,7 +152,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
                   child: TextField(
                     controller: formController,
                     decoration: const InputDecoration(
-                      labelText: 'Form',
+                      labelText: 'Tela',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -163,9 +160,9 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
                 const SizedBox(width: 8),
                 Expanded(
                   child: TextField(
-                    controller: idEmpresaController,
+                    controller: environmentController,
                     decoration: const InputDecoration(
-                      labelText: 'ID Empresa',
+                      labelText: 'Ambiente',
                       border: OutlineInputBorder(),
                     ),
                   ),
@@ -187,7 +184,7 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 Text('Descrição: ${archive.description}'),
-                                Text('Tela: ${archive.form} - Emp_ID: ${archive.emp_id}'),
+                                Text('Tela: ${archive.form} - Ambiente: ${archive.environment}'),
                                 Text('Arquivo: ${archive.archive ?? "Nenhum"}'),
                                 Text('Atualizado: ${formatarDate(archive.dateUpdated)}'),
                               ],

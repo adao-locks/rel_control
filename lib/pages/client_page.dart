@@ -119,6 +119,8 @@ class _ClientPageState extends State<ClientPage> {
       appBar: AppBar(
         title: Text('Bem-vindo'),
         centerTitle: true,
+        backgroundColor: const Color.fromARGB(125, 192, 21, 21),
+        foregroundColor: Colors.black,
         actions: [
           Container(
             alignment: Alignment.center,
@@ -138,22 +140,7 @@ class _ClientPageState extends State<ClientPage> {
                   context, '/login', (route) => false);
             },
           ),
-          IconButton(
-            icon: const Icon(Icons.info_outline),
-            onPressed: () {
-              showAboutDialog(
-                context: context,
-                applicationName: 'RelControl',
-                applicationVersion: '1.0.0',
-                applicationIcon: const Icon(Icons.computer),
-                children: [
-                  const Text('Aplicativo de controle de relatório para supervisão e automação.'),
-                  const SizedBox(height: 10),
-                  const Text('Desenvolvido por Eduardo Adão Locks e Vinicius Brehmer'),
-                ],
-              );
-            },
-          ),
+          Padding(padding: const EdgeInsets.all(8),),
         ],
       ),
       body: Padding(
@@ -174,7 +161,7 @@ class _ClientPageState extends State<ClientPage> {
                           FilteringTextInputFormatter.digitsOnly,
                         ],
                         decoration: const InputDecoration(
-                          labelText: 'Codcli',
+                          labelText: 'Codigo',
                           border: OutlineInputBorder(),
                           counterText: '',
                         ),
@@ -197,7 +184,7 @@ class _ClientPageState extends State<ClientPage> {
                               }
                             },
                         decoration: const InputDecoration(
-                          labelText: 'Nome do Cliente',
+                          labelText: 'Nome...',
                           border: OutlineInputBorder(),
                         ),
                       ),

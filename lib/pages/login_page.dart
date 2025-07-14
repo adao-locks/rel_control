@@ -124,7 +124,8 @@ class _LoginPageState extends State<LoginPage> {
       appBar: AppBar(
         title: const Text('Login'),
         centerTitle: true,
-        backgroundColor: Colors.teal,
+        backgroundColor: const Color.fromARGB(125, 192, 21, 21),
+        foregroundColor: Colors.black,
         actions: [
           IconButton(
             icon: const Icon(Icons.info_outline),
@@ -132,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
               showAboutDialog(
                 context: context,
                 applicationName: 'RelControl',
-                applicationVersion: '1.0.0',
+                applicationVersion: '1.2.45',
                 applicationIcon: const Icon(Icons.computer),
                 children: [
                   const Text(
@@ -189,12 +190,23 @@ class _LoginPageState extends State<LoginPage> {
               children: [
                 ElevatedButton(
                   onPressed: () => login(checkUser: true),
-                  child: const Text('Entrar'),
+                  child: const Text(
+                    'Entrar',
+                    style: TextStyle(
+                      color: Color.fromARGB(125, 192, 21, 21),
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
-                const SizedBox(width: 10),
+                const SizedBox(width: 5),
                 ElevatedButton(
                   onPressed: () => login(checkUser: false),
-                  child: const Text('Entrar como Visitante'),
+                  child: const Text(
+                    'Entrar como Visitante',
+                    style: TextStyle(
+                      color: Color.fromARGB(125, 192, 21, 21),
+                      fontWeight: FontWeight.bold,
+                    ),),
                 ),
               ],
             ),

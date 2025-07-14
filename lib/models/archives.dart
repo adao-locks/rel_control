@@ -3,17 +3,17 @@ class Archives {
   final String name;
   final String description;
   final String form;
-  final String emp_id;
+  final String environment;
   final String? archive;
   final DateTime dateRegistered;
   final DateTime dateUpdated;
 
-  Archives({
+  Archives( {
     required this.id,
     required this.name,
     required this.description,
     required this.form,
-    required this.emp_id,
+    required this.environment,
     required this.archive,
     required this.dateRegistered,
     required this.dateUpdated,
