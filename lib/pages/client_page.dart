@@ -27,8 +27,12 @@ class _ClientPageState extends State<ClientPage> {
   void initState() {
     super.initState();
     carregarClients();
-    codcliController.addListener(aplicarFiltro);
-    nameController.addListener(aplicarFiltro);
+    codcliController.addListener(() {
+      aplicarFiltro();
+    });
+    nameController.addListener(() {
+      aplicarFiltro();
+    });
   }
 
   Future<void> carregarClients() async {
@@ -68,7 +72,6 @@ class _ClientPageState extends State<ClientPage> {
             client.name.toUpperCase().contains(nameFilter);
       }));
     });
-    await carregarClients();
   }
 
   void adicionarClient() async {
@@ -181,22 +184,22 @@ class _ClientPageState extends State<ClientPage> {
                     Expanded(
                       child: TextField(
                         controller: nameController,
-                        decoration: const InputDecoration(
-                          labelText: 'Nome do Cliente',
-                          border: OutlineInputBorder(),
-                        ),
                         onChanged: (value) {
                               final upperValue = value.toUpperCase();
                               if (value != upperValue) {
                                 nameController.value = nameController.value
-                                    .copyWith(
-                                      text: upperValue,
-                                      selection: TextSelection.collapsed(
-                                        offset: upperValue.length,
-                                      ),
-                                    );
+                                  .copyWith(
+                                    text: upperValue,
+                                    selection: TextSelection.collapsed(
+                                      offset: upperValue.length,
+                                    ),
+                                  );
                               }
                             },
+                        decoration: const InputDecoration(
+                          labelText: 'Nome do Cliente',
+                          border: OutlineInputBorder(),
+                        ),
                       ),
                     ),
                     const SizedBox(width: 20),
