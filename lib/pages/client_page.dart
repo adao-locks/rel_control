@@ -35,6 +35,35 @@ class _ClientPageState extends State<ClientPage> {
     });
   }
 
+  void confirmDelete(String id) async {
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        title: const Text('Confirmação'),
+        content: const Text('Deseja realmente excluir este registro?'),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: const Text('Cancelar'),
+          ),
+          TextButton(
+            onPressed: () => Navigator.pop(context, true),
+            child: const Text('Excluir'),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final conn = await DB.connect();
+      await conn.execute(
+        'DELETE FROM client WHERE id = @id',
+        substitutionValues: {'id': id},
+      );
+    }
+    carregarClients();
+  }
+
   Future<void> carregarClients() async {
     final conn = await DB.connect();
     final resultado = await conn.query('''
@@ -229,7 +258,17 @@ class _ClientPageState extends State<ClientPage> {
                           child: ListTile(
                             title: Text('${client.codcli} - ${client.name}'),
                             subtitle: Text('${client.archivesCount} registro(s)'),
-                            trailing: const Icon(Icons.arrow_forward_ios),
+                            trailing: Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.delete, color: Colors.red),
+                                tooltip: 'Excluir',
+                                onPressed: () => confirmDelete(client.id),
+                              ),
+                              const Icon(Icons.arrow_forward_ios),
+                            ],
+                          ),
                             onTap: () => abrirArchives(client),
                           ),
                         );
