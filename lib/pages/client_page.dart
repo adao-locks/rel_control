@@ -213,10 +213,7 @@ class _ClientPageState extends State<ClientPage> {
                       ElevatedButton.icon(
                         onPressed: carregarClients,
                         icon: const Icon(Icons.replay_outlined),
-                        label: SizedBox.shrink(),
-                        style: ElevatedButton.styleFrom(
-                          padding: const EdgeInsets.all(12), // ajuste conforme necessário
-                        ),
+                        label: Text('Recarregar'),
                       ),
                       Padding(padding: const EdgeInsets.all(8),),
                       ElevatedButton.icon(
