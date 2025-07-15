@@ -133,7 +133,7 @@ class _LoginPageState extends State<LoginPage> {
               showAboutDialog(
                 context: context,
                 applicationName: 'RelControl',
-                applicationVersion: '1.2.45',
+                applicationVersion: '1.3.48',
                 applicationIcon: const Icon(Icons.computer),
                 children: [
                   const Text(
