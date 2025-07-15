@@ -343,16 +343,24 @@ class _ArchivesPageState extends State<ArchivesPage> {
       body: Padding(
         padding: const EdgeInsets.all(12),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 4,
+              shadowColor: Colors.grey.shade300,
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(20),
                 child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     TextField(
                       controller: nameController,
                       decoration: const InputDecoration(
-                        labelText: 'Titulo',
+                        labelText: 'Título',
+                        prefixIcon: Icon(Icons.title),
                         border: OutlineInputBorder(),
                       ),
                       textCapitalization: TextCapitalization.characters,
@@ -361,36 +369,31 @@ class _ArchivesPageState extends State<ArchivesPage> {
                         if (value != upperValue) {
                           nameController.value = nameController.value.copyWith(
                             text: upperValue,
-                            selection: TextSelection.collapsed(
-                              offset: upperValue.length,
-                            ),
+                            selection: TextSelection.collapsed(offset: upperValue.length),
                           );
                         }
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     TextField(
                       controller: descriptionController,
                       decoration: const InputDecoration(
                         labelText: 'Descrição',
+                        prefixIcon: Icon(Icons.description),
                         border: OutlineInputBorder(),
                       ),
                       textCapitalization: TextCapitalization.characters,
                       onChanged: (value) {
                         final upperValue = value.toUpperCase();
                         if (value != upperValue) {
-                          descriptionController.value = descriptionController
-                              .value
-                              .copyWith(
-                                text: upperValue,
-                                selection: TextSelection.collapsed(
-                                  offset: upperValue.length,
-                                ),
-                              );
+                          descriptionController.value = descriptionController.value.copyWith(
+                            text: upperValue,
+                            selection: TextSelection.collapsed(offset: upperValue.length),
+                          );
                         }
                       },
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 12),
                     Row(
                       children: [
                         Expanded(
@@ -398,77 +401,93 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             controller: formController,
                             decoration: const InputDecoration(
                               labelText: 'Local',
+                              prefixIcon: Icon(Icons.map_outlined),
                               border: OutlineInputBorder(),
                             ),
                             textCapitalization: TextCapitalization.characters,
                             onChanged: (value) {
                               final upperValue = value.toUpperCase();
                               if (value != upperValue) {
-                                formController.value = formController.value
-                                    .copyWith(
-                                      text: upperValue,
-                                      selection: TextSelection.collapsed(
-                                        offset: upperValue.length,
-                                      ),
-                                    );
+                                formController.value = formController.value.copyWith(
+                                  text: upperValue,
+                                  selection: TextSelection.collapsed(offset: upperValue.length),
+                                );
                               }
                             },
                           ),
                         ),
-                        const SizedBox(width: 8),
+                        const SizedBox(width: 12),
                         Expanded(
                           child: TextField(
                             controller: environmentController,
                             decoration: const InputDecoration(
                               labelText: 'Ambiente',
+                              prefixIcon: Icon(Icons.dashboard_customize_outlined),
                               border: OutlineInputBorder(),
                             ),
                             textCapitalization: TextCapitalization.characters,
                             onChanged: (value) {
                               final upperValue = value.toUpperCase();
                               if (value != upperValue) {
-                                environmentController.value = environmentController
-                                    .value
-                                    .copyWith(
-                                      text: upperValue,
-                                      selection: TextSelection.collapsed(
-                                        offset: upperValue.length,
-                                      ),
-                                    );
+                                environmentController.value = environmentController.value.copyWith(
+                                  text: upperValue,
+                                  selection: TextSelection.collapsed(offset: upperValue.length),
+                                );
                               }
                             },
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(width: 8),
-                    if (tipoUsuario == 'admin')
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        const SizedBox(height: 15),
-                        ElevatedButton.icon(
+                    const SizedBox(height: 20),
+                    if (tipoUsuario == 'admin') ...[
+                      Center(
+                        child: ElevatedButton.icon(
                           onPressed: selectArchive,
                           icon: const Icon(Icons.attach_file),
                           label: const Text('Anexar Arquivo'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blueGrey.shade700,
+                            foregroundColor: Colors.white,
+                          ),
                         ),
-                        const SizedBox(height: 8),
-                        Text(
-                          selectedArchive ?? 'Nenhum arquivo selecionado',
-                          overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 10),
+                      if (selectedArchive != null)
+                        Row(
+                          children: [
+                            const Icon(Icons.insert_drive_file, size: 20, color: Colors.grey),
+                            const SizedBox(width: 6),
+                            Expanded(
+                              child: Text(
+                                selectedArchive!.split(Platform.pathSeparator).last,
+                                style: const TextStyle(fontStyle: FontStyle.italic),
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                          ],
+                        )
+                      else
+                        const Center(
+                          child: Text(
+                            'Nenhum arquivo selecionado',
+                            style: TextStyle(color: Colors.grey),
+                          ),
                         ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
+                    ],
+                    const SizedBox(height: 20),
                     if (tipoUsuario == 'admin')
-                      ElevatedButton(
-                        onPressed: editingArchiveId == null
-                            ? addArchives
-                            : editArchive,
-                        child: Text(
-                          editingArchiveId == null
-                              ? 'Salvar Registro'
-                              : 'Atualizar Registro',
+                      Center(
+                        child: ElevatedButton.icon(
+                          onPressed: editingArchiveId == null ? addArchives : editArchive,
+                          icon: Icon(editingArchiveId == null ? Icons.save : Icons.update),
+                          label: Text(editingArchiveId == null ? 'Salvar Registro' : 'Atualizar Registro'),
+                          style: ElevatedButton.styleFrom(
+                            padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 14),
+                            backgroundColor: editingArchiveId == null ? Colors.green : Colors.orange,
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
+                          ),
                         ),
                       ),
                   ],
@@ -489,19 +508,11 @@ class _ArchivesPageState extends State<ArchivesPage> {
                             subtitle: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                Text('Descrição: ${archives.description}'),
-                                Text(
-                                  'Tela: ${archives.form} - Ambiente: ${archives.environment}',
-                                ),
-                                Text(
-                                  'Arquivo: ${archives.archive ?? "Nenhum"}',
-                                ),
-                                Text(
-                                  'Cadastro: ${formatardate(archives.dateRegistered)}',
-                                ),
-                                Text(
-                                  'Última Alteração: ${formatardate(archives.dateUpdated)}',
-                                ),
+                                Text('📄 Descricao: ${archives.description}'),
+                                Text('🧭 Tela: ${archives.form} | Ambiente: ${archives.environment}',),
+                                Text('📁 Arquivo: ${archives.archive?.split(Platform.pathSeparator).last ?? "Nenhum arquivo"}',),
+                                Text('📅 Criado: ${formatardate(archives.dateRegistered)}',),
+                                Text('🔄 Atualizado: ${formatardate(archives.dateUpdated)}',),
                               ],
                             ),
                             isThreeLine: true,
@@ -511,8 +522,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       IconButton(
-                                        //OpenButton
-                                        icon: const Icon(Icons.open_in_new),
+                                        icon: const Icon(Icons.open_in_new, color: Colors.green),
                                         onPressed: () {
                                           if (archives.archive != null &&
                                               File(
@@ -533,8 +543,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                         },
                                       ),
                                       IconButton(
-                                        //DownloadButton
-                                        icon: const Icon(Icons.download),
+                                        icon: const Icon(Icons.download, color: Colors.indigo),
                                         onPressed: () {
                                           if (archives.archive != null &&
                                               File(
@@ -558,11 +567,7 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                         },
                                       ),
                                       IconButton(
-                                        //EditButton
-                                        icon: const Icon(
-                                          Icons.edit,
-                                          color: Colors.blue,
-                                        ),
+                                      icon: const Icon(Icons.edit, color: Colors.orange),
                                         onPressed: () {
                                           setState(() {
                                             nameController.text = archives.name;
@@ -577,13 +582,8 @@ class _ArchivesPageState extends State<ArchivesPage> {
                                         },
                                       ),
                                       IconButton(
-                                        //DeleteButton
-                                        icon: const Icon(
-                                          Icons.delete,
-                                          color: Colors.red,
-                                        ),
-                                        onPressed: () =>
-                                            confirmDelete(archives.id),
+                                        icon: const Icon(Icons.delete, color: Colors.red),
+                                        onPressed: () => confirmDelete(archives.id),
                                       ),
                                     ],
                                   )
