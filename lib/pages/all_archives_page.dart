@@ -133,17 +133,39 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
             TextField(
               controller: nameController,
               decoration: const InputDecoration(
-                labelText: 'Titulo',
+                labelText: 'Título',
+                prefixIcon: Icon(Icons.title),
                 border: OutlineInputBorder(),
               ),
+              textCapitalization: TextCapitalization.characters,
+              onChanged: (value) {
+                final upperValue = value.toUpperCase();
+                if (value != upperValue) {
+                  nameController.value = nameController.value.copyWith(
+                    text: upperValue,
+                    selection: TextSelection.collapsed(offset: upperValue.length),
+                  );
+                }
+              },
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: 12),
             TextField(
               controller: descriptionController,
               decoration: const InputDecoration(
                 labelText: 'Descrição',
+                prefixIcon: Icon(Icons.description),
                 border: OutlineInputBorder(),
               ),
+              textCapitalization: TextCapitalization.characters,
+              onChanged: (value) {
+                final upperValue = value.toUpperCase();
+                if (value != upperValue) {
+                  descriptionController.value = descriptionController.value.copyWith(
+                    text: upperValue,
+                    selection: TextSelection.collapsed(offset: upperValue.length),
+                  );
+                }
+              },
             ),
             const SizedBox(height: 8),
             Row(
@@ -152,19 +174,41 @@ class _AllArchivesPageState extends State<AllArchivesPage> {
                   child: TextField(
                     controller: formController,
                     decoration: const InputDecoration(
-                      labelText: 'Tela',
+                      labelText: 'Local',
+                      prefixIcon: Icon(Icons.map_outlined),
                       border: OutlineInputBorder(),
                     ),
+                    textCapitalization: TextCapitalization.characters,
+                    onChanged: (value) {
+                      final upperValue = value.toUpperCase();
+                      if (value != upperValue) {
+                        formController.value = formController.value.copyWith(
+                          text: upperValue,
+                          selection: TextSelection.collapsed(offset: upperValue.length),
+                        );
+                      }
+                    },
                   ),
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: 12),
                 Expanded(
                   child: TextField(
                     controller: environmentController,
                     decoration: const InputDecoration(
                       labelText: 'Ambiente',
+                      prefixIcon: Icon(Icons.dashboard_customize_outlined),
                       border: OutlineInputBorder(),
                     ),
+                    textCapitalization: TextCapitalization.characters,
+                    onChanged: (value) {
+                      final upperValue = value.toUpperCase();
+                      if (value != upperValue) {
+                        environmentController.value = environmentController.value.copyWith(
+                          text: upperValue,
+                          selection: TextSelection.collapsed(offset: upperValue.length),
+                        );
+                      }
+                    },
                   ),
                 ),
               ],
